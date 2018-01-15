@@ -1,8 +1,34 @@
 var SpacebookApp = function() {
     
-      var posts = [];
-    
+      var posts = [];      
+      
+      //data should be fetched when page loads in first place
+     
       var $posts = $(".posts");
+
+      var fetch = function () {
+        
+          var strUrl = "/posts";
+      
+        $.ajax({
+      
+          method: "GET",
+          url: strUrl,
+          success: function (data) {
+
+            posts = data;
+            console.log("posts from fetch" + posts);
+           _renderPosts();
+                 
+            //send post to render    
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.log(textStatus);
+          }
+        });
+      };
+
+      fetch();      
     
       _renderPosts();
     
@@ -51,7 +77,7 @@ var SpacebookApp = function() {
         posts[postIndex].comments.splice(commentIndex, 1);
         _renderComments(postIndex);
       };
-    
+      
       return {
         addPost: addPost,
         removePost: removePost,
@@ -60,6 +86,8 @@ var SpacebookApp = function() {
       };
     };
     
+
+   
     var app = SpacebookApp();
     
     

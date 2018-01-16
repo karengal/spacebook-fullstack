@@ -3,6 +3,9 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var db = "spacebookDB";
 
+// app.use(bodyParser.urlencoded({ extended: false }));
+// app.use(bodyParser.json());
+
 mongoose.connect('mongodb://localhost/spacebookDB', function () {
     console.log("DB connection established!!!");
 })
@@ -18,13 +21,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // You will need to create 5 server routes
 // These will define your API:
-
-// 1) to handle getting all posts and their comments
-//this should call  a function in main.js 
-//  app.get('/posts', function (req, res) {
-//         res.send('Hey!');
-//       });
-
 
 Post.findOne({ text: "test first post" }, function (err, post) {
     console.log("post before fetch: " + post);
@@ -47,8 +43,35 @@ app.get("/posts", function (req, res) {
     //res.send(data);
 });
 
+app.post('/posts', function(req, res){
+    
+    var postObj = new Post({
+        text: req.body.text,
+        comments: []        
+    });
+    postObj.save(function (err, post) {
+        if (err) { 
+            console.log(err);
+        }
+        res.json(201, post);
+      });
+    
+});
+
+app.delete("/delete/:id", function (req, res) {
 
 
+    Post.findOneAndRemove({_id : new mongoose.mongo.ObjectID(req.params.id)}, function (err,post){
+        if (err)
+        res.send(err);
+    else
+        //want to see the deleted post
+        res.json(201, post);
+      });
+      
+});
+   
+     
 // 2) to handle adding a post
 // 3) to handle deleting a post
 // 4) to handle adding a comment to a post

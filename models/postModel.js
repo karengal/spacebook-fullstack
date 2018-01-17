@@ -43,3 +43,4 @@ var Comment = mongoose.model('comment', commentSchema);
 //   })
   
 module.exports = Post
+//module.exports = Comment

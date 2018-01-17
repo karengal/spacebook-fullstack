@@ -1,8 +1,6 @@
 var SpacebookApp = function () {
 
-    var posts = [];
-
-    //data should be fetched when page loads in first place
+    var posts = [];    
 
     var $posts = $(".posts");
 
@@ -27,6 +25,7 @@ var SpacebookApp = function () {
         });
     };
 
+    //data should be fetched when page loads in first place
     fetch();
 
     _renderPosts();
@@ -61,9 +60,6 @@ var SpacebookApp = function () {
             }
         });
 
-        //posts.push({ text: newPost, comments: [] });
-
-
     }
 
 
@@ -81,36 +77,55 @@ var SpacebookApp = function () {
 
     var removePost = function (index) {
         //find the post in db and remove it
-        //after recieveing server response remove from array and render view      
-   
+        //after recieveing server response remove from array and render view   
 
-        // console.log(posts[index]);
         var postId = posts[index]._id;
         console.log(postId);
 
         $.ajax({
 
             type: "DELETE",
-            url: "/delete/"+postId,
+            url: "/delete/" + postId,
             success: function (data) {
                 // console.log(postId);
                 console.log(data);
                 posts.splice(index, 1);
                 fetch();
-                _renderPosts();       
-                
+                _renderPosts();
+
             },
             error: function (error) {
 
             }
         });
 
-        
-    };
 
-    var addComment = function (newComment, postIndex) {
-        posts[postIndex].comments.push(newComment);
-        _renderComments(postIndex);
+    };
+   
+    var addComment = function (newCommentObj, postIndex) {
+        
+        //pass the server post id to which to add a comment  
+        var postId = posts[postIndex]._id;
+        console.log(postId);
+
+        $.ajax({
+
+            type: "POST",
+            url: "/posts/" + postId,
+            data: newCommentObj,
+            success: function (data) {                
+              //when data is ssuccessfully back from server push it to posts array 
+                console.log(data.comments);
+                posts[postIndex].comments = (data.comments);
+                console.log(posts[postIndex]);
+                _renderComments(postIndex);                
+
+            },
+            error: function (error) {
+
+            }
+        });
+
     };
 
 
@@ -128,9 +143,7 @@ var SpacebookApp = function () {
 };
 
 
-
 var app = SpacebookApp();
-
 
 $('#addpost').on('click', function () {
     var $input = $("#postText");
@@ -143,6 +156,7 @@ $('#addpost').on('click', function () {
 });
 
 var $posts = $(".posts");
+
 
 $posts.on('click', '.remove-post', function () {
     var index = $(this).closest('.post').index();;
